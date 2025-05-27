@@ -6,6 +6,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 from utils.style import APP_STYLE
 from api_client import APIClient
+from PySide6.QtWidgets import QMessageBox
 
 class LoginPage(QWidget):
     def __init__(self, main_app):
@@ -52,11 +53,19 @@ class LoginPage(QWidget):
         
         result = self.api.login(email, password, department_id)
 
+        print("Giriş denemesi:", email, password, department_id)
+        print("Giriş sonucu:", result)
         if result["success"]:
             print("✅ Giriş başarılı, token:", self.api.token)
             self.main_app.show_role_dashboard(result["user"])
         else:
-            print("❌ Giriş başarısız:", result["detail"])
+            error_detail = result["detail"]
+            # Eğer hata email geçersizliğiyse
+            if error_detail and isinstance(error_detail, list) and "email" in error_detail[0]["loc"]:
+                reason = error_detail[0]["msg"]
+                QMessageBox.warning(self, "Geçersiz E-posta", f"E-posta formatı hatalı: {reason}")
+            else:
+                QMessageBox.warning(self, "Giriş Başarısız", "Giriş yapılamadı, lütfen bilgilerinizi kontrol edin.")
 
 
     def load_departments(self):
