@@ -41,9 +41,9 @@ class SolveQuizPage(QWidget):
         self.layout.addWidget(self.question_label)
 
         # 🔊 Oku butonu
-        self.read_button = QPushButton("🔊 Oku")
-        self.read_button.clicked.connect(self.read_question_aloud)
-        self.layout.addWidget(self.read_button)
+        # self.read_button = QPushButton("🔊 Oku")
+        # self.read_button.clicked.connect(self.read_question_aloud)
+        # self.layout.addWidget(self.read_button)
 
         self.option_group = QButtonGroup(self)
         self.options_layout = QVBoxLayout()
