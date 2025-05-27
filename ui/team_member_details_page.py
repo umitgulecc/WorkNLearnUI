@@ -25,7 +25,7 @@ class TeamMemberDetailsPage(QWidget):
 
     def load_user_results(self):
         result = self.api.get_user_results(self.user_id)
-
+        print("Kullanıcı sonuçları:", result)
         if not result["success"]:
             err = QLabel("❌ Quiz verisi alınamadı.")
             err.setStyleSheet("color: red;")
@@ -45,7 +45,8 @@ class TeamMemberDetailsPage(QWidget):
             title.setStyleSheet("color: white; font-size: 14px;")
 
             detail_btn = QPushButton("🔍 İncele")
-            detail_btn.clicked.connect(lambda _, rid=quiz['result_id']: self.main_app.go_to_review_quiz(rid))
+            print("member detayları:", self.user_id, quiz['result_id'])
+            detail_btn.clicked.connect(lambda _, rid=quiz['result_id']: self.main_app.go_to_review_quiz(rid, self.user_id))
 
             row.addWidget(title)
             row.addWidget(detail_btn)

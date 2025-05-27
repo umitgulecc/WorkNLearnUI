@@ -39,7 +39,7 @@ class ReviewQuizPage(QWidget):
         if self.user_id == self.main_app.current_user["id"]:
             back.linkActivated.connect(lambda _: self.main_app.show_role_dashboard(self.main_app.current_user))
         else:
-            back.linkActivated.connect(lambda _: self.main_app.go_to_team_member_list())
+            back.linkActivated.connect(lambda _: self.main_app.go_to_team_member_details(self.user_id))
             # 👆 Bu fonksiyon müdürün dashboarduna geri döner
 
         self.layout.addWidget(back)

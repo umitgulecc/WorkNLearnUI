@@ -32,9 +32,8 @@ class LoginPage(QWidget):
         self.password_input.setEchoMode(QLineEdit.Password)
 
         self.department_combo = QComboBox()
-        self.department_combo.addItem("🧑‍💼 İnsan Kaynakları")
-        self.department_combo.addItem("💻 Yazılım")
-
+        self.layout().addWidget(self.department_combo)
+        self.load_departments()
         self.login_button = QPushButton("Giriş Yap")
         self.login_button.clicked.connect(self.login)
 
@@ -49,8 +48,9 @@ class LoginPage(QWidget):
     def login(self):
         email = self.email_input.text()
         password = self.password_input.text()
-
-        result = self.api.login(email, password)
+        department_id = self.department_combo.currentData()
+        
+        result = self.api.login(email, password, department_id)
 
         if result["success"]:
             print("✅ Giriş başarılı, token:", self.api.token)
@@ -59,3 +59,7 @@ class LoginPage(QWidget):
             print("❌ Giriş başarısız:", result["detail"])
 
 
+    def load_departments(self):
+        departments = self.api.get_departments()
+        for dept in departments:
+            self.department_combo.addItem(dept["name"], dept["id"])

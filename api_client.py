@@ -6,11 +6,12 @@ class APIClient:
         self.base_url = base_url
         self.token = None
 
-    def login(self, email, password):
+    def login(self, email, password, department_id):
         try:
-            response = requests.post(f"{self.base_url}/login", data={
-                "username": email,       # ⚠️ username olmalı!
-                "password": password     # ⚠️ form-data formatı!
+            response = requests.post(f"{self.base_url}/login", json={
+                "email": email,       # ⚠️ username olmalı!
+                "password": password,     # ⚠️ form-data formatı!
+                "department_id": department_id
             })
 
             if response.status_code == 200:
@@ -117,6 +118,7 @@ class APIClient:
     def get_user_results(self, user_id):
         try:
             res = requests.get(f"{self.base_url}/team/results/{user_id}", headers={"Authorization": f"Bearer {self.token}"})
+            print("Kullanıcı sonuçları:", res.status_code, res.text)  # DEBUG
             if res.status_code == 200:
                 return {"success": True, "quizzes": res.json()}
             else:
@@ -138,3 +140,18 @@ class APIClient:
                 return {"success": False, "detail": detail}
         except Exception as e:
             return {"success": False, "detail": str(e)}
+
+    
+    def post(self, path, json=None):
+        return requests.post(
+            f"{self.base_url}{path}",
+            headers={"Authorization": f"Bearer {self.token}"},
+            json=json
+        )
+        
+        
+    def get_departments(self):
+        response = requests.get(f"{self.base_url}/departments", headers={"Authorization": f"Bearer {self.token}"})
+        if response.status_code == 200:
+            return response.json()
+        return []

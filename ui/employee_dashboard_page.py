@@ -21,7 +21,7 @@ class EmployeeDashboardPage(QWidget):
         welcome.setStyleSheet("font-size: 20px; color: white;")
         self.layout.addWidget(welcome)
         
-        logout = self.add_button("Logout", self.logout_user)
+        logout = self.add_button("Çıkış Yap", self.logout_user)
         self.layout.addWidget(logout)
 
         self.add_button("📝 Quiz Çöz", self.main_app.go_to_quiz)
