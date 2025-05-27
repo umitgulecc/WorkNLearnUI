@@ -1,9 +1,11 @@
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 
 class AddEmployeeForm(QDialog):
-    def __init__(self, api_client):
+    def __init__(self, main_app):
         super().__init__()
-        self.api = api_client
+        self.main_app = main_app
+        self.api = main_app.api
+
         self.setWindowTitle("Yeni Çalışan Ekle")
         self.setFixedSize(300, 250)
 
@@ -22,27 +24,24 @@ class AddEmployeeForm(QDialog):
         self.password_input.setEchoMode(QLineEdit.Password)
         layout.addWidget(self.password_input)
 
-        
         self.department_input = QLineEdit()
         self.department_input.setPlaceholderText("Departman Adı")
-        layout.addWidget(self.department_input)   
-        
-        
+        layout.addWidget(self.department_input)
+
         self.submit_btn = QPushButton("✅ Kaydet")
         self.submit_btn.setStyleSheet("background-color: #2196F3; color: white; padding: 8px; border-radius: 6px;")
         self.submit_btn.clicked.connect(self.register_employee)
         layout.addWidget(self.submit_btn)
 
     def register_employee(self):
-        departments = self.api.get_departments()  # [{"id": 1, "name": "İnsan Kaynakları"}, ...]
+        departments = self.api.get_departments()
         department_name = self.to_upper_english(self.department_input.text().strip())
-        
+
         department_id = next((d["id"] for d in departments if self.to_upper_english(d["name"]) == department_name), None)
 
         name = self.name_input.text().strip()
         email = self.email_input.text().strip()
         password = self.password_input.text().strip()
-        
 
         if not name or not email or not password:
             QMessageBox.warning(self, "Eksik Bilgi", "Lütfen tüm alanları doldurun.")
@@ -52,6 +51,7 @@ class AddEmployeeForm(QDialog):
             if department_id is None:
                 QMessageBox.warning(self, "Hata", "Girilen departman adı geçersiz.")
                 return
+
             response = self.api.post("/register", json={
                 "email": email,
                 "full_name": name,
@@ -63,9 +63,15 @@ class AddEmployeeForm(QDialog):
             if response.status_code == 200:
                 data = response.json()
                 QMessageBox.information(self, "Başarılı", data["message"])
-                self.accept()
+
+                # ✅ Başarılı kayıt sonrası tabloyu yenile
+                if hasattr(self.main_app, "manager_dashboard_page"):
+                    self.main_app.manager_dashboard_page.refresh_team_summary()
+
+                self.accept()  # formu kapat
             else:
                 QMessageBox.warning(self, "Hata", f"Kayıt başarısız: {response.text}")
+
         except Exception as e:
             QMessageBox.critical(self, "Sunucu Hatası", str(e))
 
@@ -80,10 +86,11 @@ class AddEmployeeForm(QDialog):
             'ş': 's', 'Ş': 'S',
             'ü': 'u', 'Ü': 'U'
         }
-
-        # Harfleri değiştir
         for turkish, english in replacements.items():
             text = text.replace(turkish, english)
-
-        # Tamamen büyük harf yap
         return text.upper()
+
+    def closeEvent(self, event):
+        if hasattr(self.main_app, "manager_dashboard_page"):
+            self.main_app.manager_dashboard_page.refresh_team_summary()
+        super().closeEvent(event)

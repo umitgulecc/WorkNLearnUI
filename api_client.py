@@ -155,3 +155,34 @@ class APIClient:
         if response.status_code == 200:
             return response.json()
         return []
+
+
+    def get_users_by_department(self):
+        try:
+            response = requests.get(
+                f"{self.base_url}/users/by-department",
+                headers={"Authorization": f"Bearer {self.token}"}
+            )
+            if response.status_code == 200:
+                return response.json()
+            else:
+                return []
+        except Exception:
+            return []
+
+
+    def delete_user_by_id(self, user_id):
+        """
+        Belirtilen ID'ye sahip kullanıcıyı siler.
+        """
+        try:
+            response = requests.delete(
+                f"{self.base_url}/user/{user_id}",
+                headers={"Authorization": f"Bearer {self.token}"}
+            )
+            if response.status_code == 200:
+                return {"success": True, "detail": response.json()["detail"]}
+            else:
+                return {"success": False, "detail": response.json().get("detail", "Hata oluştu")}
+        except Exception as e:
+            return {"success": False, "detail": str(e)}

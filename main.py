@@ -26,17 +26,20 @@ class MainApp(QStackedWidget):
         self.current_user = user_data
         role_id = user_data.get("role_id")
         print("Rol ID:", role_id)
+
         if role_id == 3:  # 🎓 Çalışan
             from ui.employee_dashboard_page import EmployeeDashboardPage
             self.dashboard = EmployeeDashboardPage(self)
 
         elif role_id == 2:  # 🧑‍💼 Müdür
             from ui.manager_dashboard_page import ManagerDashboardPage
-            self.dashboard = ManagerDashboardPage(self)
+            self.manager_dashboard_page = ManagerDashboardPage(self)  # ✅ ekledik
+            self.dashboard = self.manager_dashboard_page              # ✅ eskisi korunuyor
 
         elif role_id == 1:  # 👑 Genel Müdür
             from ui.director_dashboard_page import DirectorDashboardPage
-            self.dashboard = DirectorDashboardPage(self)
+            self.director_dashboard_page = DirectorDashboardPage(self)
+            self.dashboard = self.director_dashboard_page
 
         else:
             from PySide6.QtWidgets import QLabel
@@ -44,6 +47,7 @@ class MainApp(QStackedWidget):
 
         self.addWidget(self.dashboard)
         self.setCurrentWidget(self.dashboard)
+
 
 
 
@@ -81,6 +85,12 @@ class MainApp(QStackedWidget):
         self.login_page = LoginPage(self)
         self.addWidget(self.login_page)
         self.setCurrentWidget(self.login_page)
+
+    
+    def show_delete_employee_page(self):
+        from ui.delete_employee_page import DeleteEmployeePage
+        self.delete_employee_page = DeleteEmployeePage(self)
+        self.delete_employee_page.show()
 
 
 if __name__ == "__main__":
