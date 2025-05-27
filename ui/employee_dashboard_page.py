@@ -49,7 +49,7 @@ class EmployeeDashboardPage(QWidget):
     
     def load_solved_quizzes(self):
         solved = self.main_app.api.get_solved_quizzes()
-
+        print("Çözülen quizler:",solved)
         if not solved["success"]:
             err = QLabel("❌ Çözdüğünüz quizler yüklenemedi.")
             err.setStyleSheet("color: red;")
