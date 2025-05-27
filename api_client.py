@@ -8,11 +8,16 @@ class APIClient:
 
     def login(self, email, password, department_id):
         try:
-            response = requests.post(f"{self.base_url}/login", json={
-                "email": email,       # ⚠️ username olmalı!
-                "password": password,     # ⚠️ form-data formatı!
-                "department_id": department_id
-            })
+            payload = {
+                "email": email,
+                "password": password
+            }
+
+            # Sadece departman seçildiyse gönder
+            if department_id is not None:
+                payload["department_id"] = department_id
+
+            response = requests.post(f"{self.base_url}/login", json=payload)
 
             if response.status_code == 200:
                 data = response.json()
@@ -22,6 +27,7 @@ class APIClient:
                 return {"success": False, "detail": response.json().get("detail")}
         except Exception as e:
             return {"success": False, "detail": str(e)}
+
 
     def logout(self):
         self.token = None
@@ -186,3 +192,18 @@ class APIClient:
                 return {"success": False, "detail": response.json().get("detail", "Hata oluştu")}
         except Exception as e:
             return {"success": False, "detail": str(e)}
+        
+    def get_all_users(self):
+            try:
+                response = requests.get(
+                    f"{self.base_url}/all-users",
+                    headers={"Authorization": f"Bearer {self.token}"}
+                )
+                if response.status_code == 200:
+                    return response.json()  # bu bir list[UserBasicOut]
+                else:
+                    print("🛑 Kullanıcı listesi alınamadı:", response.text)
+                    return []
+            except Exception as e:
+                print("❌ API Hatası:", e)
+                return []

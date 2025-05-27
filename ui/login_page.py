@@ -33,6 +33,8 @@ class LoginPage(QWidget):
         self.password_input.setEchoMode(QLineEdit.Password)
 
         self.department_combo = QComboBox()
+        self.department_combo.addItem("Departman Seçiniz")
+        self.department_combo.addItem("Yönetici", None)
         self.layout().addWidget(self.department_combo)
         self.load_departments()
         self.login_button = QPushButton("Giriş Yap")

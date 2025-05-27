@@ -98,6 +98,12 @@ class MainApp(QStackedWidget):
         self.delete_employee_page = DeleteEmployeePage(self)
         self.delete_employee_page.show()
 
+    def go_to_employee_stats(self):
+        from ui.employee_stats_page import EmployeeStatsPage
+        self.stats_page = EmployeeStatsPage(self)
+        self.addWidget(self.stats_page)
+        self.setCurrentWidget(self.stats_page)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

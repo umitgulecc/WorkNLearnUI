@@ -25,6 +25,8 @@ class EmployeeDashboardPage(QWidget):
         self.layout.addWidget(logout)
 
         self.add_button("📝 Quiz Çöz", self.main_app.go_to_quiz)
+        istatistik_btn = self.add_button("📈 İstatistiklerim", self.main_app.go_to_employee_stats)
+        self.layout.addWidget(istatistik_btn)
 
         self.load_solved_quizzes()
 
