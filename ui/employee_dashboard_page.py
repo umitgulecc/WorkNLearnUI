@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton
+from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton, QTableWidget, QTableWidgetItem
 from PySide6.QtCore import Qt
 from utils.style import APP_STYLE
 
@@ -49,25 +49,49 @@ class EmployeeDashboardPage(QWidget):
     
     def load_solved_quizzes(self):
         solved = self.main_app.api.get_solved_quizzes()
-        print("Çözülen quizler:",solved)
+        print("Çözülen quizler:", solved)
+
+        # Önce varsa eski tabloyu temizle
+        if hasattr(self, "table"):
+            self.layout.removeWidget(self.table)
+            self.table.deleteLater()
+
+        self.table = QTableWidget()
+        self.table.setColumnCount(2)
+        self.table.setHorizontalHeaderLabels(["Quiz Başlığı", "İncele"])
+        self.table.horizontalHeader().setStretchLastSection(True)
+        self.layout.addWidget(self.table)
+
         if not solved["success"]:
-            err = QLabel("❌ Çözdüğünüz quizler yüklenemedi.")
-            err.setStyleSheet("color: red;")
-            self.layout.addWidget(err)
+            self.table.setRowCount(1)
+            self.table.setItem(0, 0, QTableWidgetItem("❌ Quizler yüklenemedi."))
             return
 
-        if not solved["quizzes"]:
-            empty = QLabel("🕳 Henüz çözülmüş quiz bulunmuyor.")
-            empty.setStyleSheet("color: white;")
-            self.layout.addWidget(empty)
+        quizzes = solved["quizzes"]
+
+        if not quizzes:
+            self.table.setRowCount(1)
+            self.table.setItem(0, 0, QTableWidgetItem("🕳 Henüz çözülmüş quiz bulunmuyor."))
             return
 
-        title = QLabel("📊 Çözdüğünüz Quizler")
-        title.setStyleSheet("font-size: 16px; color: white; margin-top: 20px;")
-        self.layout.addWidget(title)
+        self.table.setRowCount(len(quizzes))
+        for i, quiz in enumerate(quizzes):
+            self.table.setItem(i, 0, QTableWidgetItem(quiz["title"]))
 
-        for quiz in solved["quizzes"]:
-            self.add_solved_quiz_row(quiz)
+            review_btn = QPushButton("🔍 İncele")
+            review_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #ffffff;
+                    color: #333;
+                    border-radius: 6px;
+                    padding: 5px 10px;
+                }
+                QPushButton:hover {
+                    background-color: #dddddd;
+                }
+            """)
+            review_btn.clicked.connect(lambda _, rid=quiz["result_id"]: self.main_app.go_to_review_quiz(rid))
+            self.table.setCellWidget(i, 1, review_btn)
 
     def add_solved_quiz_row(self, quiz):
         row = QVBoxLayout()
