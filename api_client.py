@@ -22,7 +22,10 @@ class APIClient:
         except Exception as e:
             return {"success": False, "detail": str(e)}
 
-
+    def logout(self):
+        self.token = None
+        return {"success": True, "message": "Çıkış başarılı"}
+    
     def get_available_quizzes(self):
         try:
             response = requests.get(
@@ -72,11 +75,18 @@ class APIClient:
                 headers={"Authorization": f"Bearer {self.token}"}
             )
             if response.status_code == 200:
-                return {"success": True, "review": response.json()}
+                data = response.json()
+                # Eğer description alanı varsa ve boş/None ise düzelt
+                print("Çözüm verisi:", data)  # DEBUG
+                if "quiz_title" not in data:
+                    data["quiz_title"] = "Untitled Quiz"
+                return {"success": True, "review": data}
             else:
-                return {"success": False, "detail": response.json().get("detail")}
+                detail = response.json().get("detail", "Bilinmeyen hata")
+                return {"success": False, "detail": detail}
         except Exception as e:
             return {"success": False, "detail": str(e)}
+
 
 
     def get_solved_quizzes(self):
@@ -111,5 +121,20 @@ class APIClient:
                 return {"success": True, "quizzes": res.json()}
             else:
                 return {"success": False, "detail": res.json().get("detail")}
+        except Exception as e:
+            return {"success": False, "detail": str(e)}
+
+
+    def get_user_quiz_stats(self):
+        try:
+            response = requests.get(
+                f"{self.base_url}/me/summary-stats",
+                headers={"Authorization": f"Bearer {self.token}"}
+            )
+            if response.status_code == 200:
+                return {"success": True, "stats": response.json()}
+            else:
+                detail = response.json().get("detail", "Bilinmeyen hata")
+                return {"success": False, "detail": detail}
         except Exception as e:
             return {"success": False, "detail": str(e)}
