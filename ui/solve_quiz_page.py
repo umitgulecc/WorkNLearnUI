@@ -1,4 +1,5 @@
 import json
+import pyttsx3
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton,
     QRadioButton, QButtonGroup, QTextEdit, QHBoxLayout
@@ -18,6 +19,10 @@ class SolveQuizPage(QWidget):
         self.current_index = 0
         self.answers = {}
 
+        # 🎙 TTS motoru
+        self.tts_engine = pyttsx3.init()
+        self.tts_engine.setProperty('rate', 160)
+
         self.setup_ui()
         self.load_quiz()
 
@@ -34,6 +39,11 @@ class SolveQuizPage(QWidget):
         self.question_label.setWordWrap(True)
         self.question_label.setStyleSheet("font-size: 16px; color: white;")
         self.layout.addWidget(self.question_label)
+
+        # 🔊 Oku butonu
+        self.read_button = QPushButton("🔊 Oku")
+        self.read_button.clicked.connect(self.read_question_aloud)
+        self.layout.addWidget(self.read_button)
 
         self.option_group = QButtonGroup(self)
         self.options_layout = QVBoxLayout()
@@ -56,7 +66,6 @@ class SolveQuizPage(QWidget):
         self.finish_button.hide()
 
         self.layout.addLayout(button_row)
-
 
         back_button = QPushButton("← Geri")
         back_button.clicked.connect(lambda: self.main_app.go_to_quiz())
@@ -98,7 +107,6 @@ class SolveQuizPage(QWidget):
         else:
             self.text_input.show()
 
-        # Butonları ayarla
         if self.current_index == len(self.questions) - 1:
             self.next_button.hide()
             self.finish_button.show()
@@ -106,9 +114,7 @@ class SolveQuizPage(QWidget):
             self.next_button.show()
             self.finish_button.hide()
 
-
     def clear_question_ui(self):
-        # Seçenekleri temizle
         for i in reversed(range(self.options_layout.count())):
             widget = self.options_layout.itemAt(i).widget()
             if widget:
@@ -117,6 +123,13 @@ class SolveQuizPage(QWidget):
 
         self.text_input.clear()
         self.text_input.hide()
+
+    def read_question_aloud(self):
+        if self.current_index < len(self.questions):
+            question = self.questions[self.current_index]
+            question_text = question.get("content", "")
+            self.tts_engine.say(question_text)
+            self.tts_engine.runAndWait()
 
     def save_answer(self):
         question = self.questions[self.current_index]
@@ -158,7 +171,7 @@ class SolveQuizPage(QWidget):
                 "written_answer": answer.get("written_answer", "")
             })
 
-        print("📤 Gönderilen Payload:\n", json.dumps(payload, indent=2))  # Debug için
+        print("📤 Gönderilen Payload:\n", json.dumps(payload, indent=2))
 
         result = self.api.submit_quiz(payload)
         if result["success"]:
@@ -166,4 +179,3 @@ class SolveQuizPage(QWidget):
             self.title.setText(f"✅ Quiz gönderildi, skor: {result['score']}")
         else:
             self.title.setText("❌ Gönderme başarısız: " + result["detail"])
-
