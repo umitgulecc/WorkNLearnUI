@@ -30,7 +30,7 @@ class QuizPage(QWidget):
         self.layout.addWidget(scroll_area)
 
         back_button = QPushButton("← Geri")
-        back_button.clicked.connect(lambda: self.main_app.show_dashboard(self.user))
+        back_button.clicked.connect(lambda: self.main_app.show_role_dashboard(self.user))
         self.layout.addWidget(back_button)
 
     def load_quizzes(self):

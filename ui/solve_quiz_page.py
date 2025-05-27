@@ -1,3 +1,4 @@
+import json
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton,
     QRadioButton, QButtonGroup, QTextEdit, QHBoxLayout
@@ -125,18 +126,22 @@ class SolveQuizPage(QWidget):
         if q_type == "multiple choise":
             checked = self.option_group.checkedButton()
             if checked:
-                self.answers[qid] = checked.property("option_id")
+                self.answers[qid] = {
+                    "selected_option_id": checked.property("option_id"),
+                    "written_answer": ""
+                }
 
         elif q_type == "open ended":
-            self.answers[qid] = self.text_input.toPlainText().strip()
-
+            self.answers[qid] = {
+                "selected_option_id": None,
+                "written_answer": self.text_input.toPlainText().strip()
+            }
 
     def save_and_next(self):
         if self.current_index < len(self.questions):
             self.save_answer()
             self.current_index += 1
             self.display_question()
-
 
     def finish_quiz(self):
         self.save_answer()
@@ -149,8 +154,11 @@ class SolveQuizPage(QWidget):
         for qid, answer in self.answers.items():
             payload["answers"].append({
                 "question_id": qid,
-                "answer": answer
+                "selected_option_id": answer.get("selected_option_id"),
+                "written_answer": answer.get("written_answer", "")
             })
+
+        print("📤 Gönderilen Payload:\n", json.dumps(payload, indent=2))  # Debug için
 
         result = self.api.submit_quiz(payload)
         if result["success"]:

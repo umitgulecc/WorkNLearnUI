@@ -6,6 +6,7 @@ class EmployeeDashboardPage(QWidget):
     def __init__(self, main_app):
         super().__init__()
         self.main_app = main_app
+        self.api = main_app.api
         self.user_data = main_app.current_user
         self.setup_ui()
 
@@ -19,6 +20,9 @@ class EmployeeDashboardPage(QWidget):
         welcome = QLabel(f"👋 Hoş geldiniz, {full_name}!")
         welcome.setStyleSheet("font-size: 20px; color: white;")
         self.layout.addWidget(welcome)
+        
+        logout = self.add_button("Logout", self.logout_user)
+        self.layout.addWidget(logout)
 
         self.add_button("📝 Quiz Çöz", self.main_app.go_to_quiz)
 
@@ -41,7 +45,8 @@ class EmployeeDashboardPage(QWidget):
         """)
         button.clicked.connect(callback)
         self.layout.addWidget(button)
-
+        return button
+    
     def load_solved_quizzes(self):
         solved = self.main_app.api.get_solved_quizzes()
 
@@ -65,7 +70,7 @@ class EmployeeDashboardPage(QWidget):
             self.add_solved_quiz_row(quiz)
 
     def add_solved_quiz_row(self, quiz):
-        row = QVBoxLayout(self)
+        row = QVBoxLayout()
         title = QLabel(f"{quiz['title']} (ID: {quiz['quiz_id']})")
         title.setStyleSheet("color: white; font-size: 13px;")
 
@@ -87,3 +92,7 @@ class EmployeeDashboardPage(QWidget):
         row.addStretch()
         row.addWidget(review_btn)
         self.layout.addLayout(row)
+        
+    def logout_user(self):
+        self.api.logout()
+        self.main_app.go_to_login()

@@ -25,7 +25,7 @@ class MainApp(QStackedWidget):
     def show_role_dashboard(self, user_data):
         self.current_user = user_data
         role_id = user_data.get("role_id")
-
+        print("Rol ID:", role_id)
         if role_id == 3:  # 🎓 Çalışan
             from ui.employee_dashboard_page import EmployeeDashboardPage
             self.dashboard = EmployeeDashboardPage(self)
@@ -75,6 +75,13 @@ class MainApp(QStackedWidget):
         self.details_page = TeamMemberDetailsPage(self, user_id)
         self.addWidget(self.details_page)
         self.setCurrentWidget(self.details_page)
+
+    def go_to_login(self):
+        self.current_user = None
+        self.login_page = LoginPage(self)
+        self.addWidget(self.login_page)
+        self.setCurrentWidget(self.login_page)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
