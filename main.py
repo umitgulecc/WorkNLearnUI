@@ -14,7 +14,7 @@ class MainApp(QStackedWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("WORK-n-LEARN")
-        self.setFixedSize(450, 560)
+        self.setFixedSize(900, 800)
 
         self.api = APIClient("http://127.0.0.1:8000")  # ⬅ global api client
         self.current_user = None

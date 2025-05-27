@@ -2,10 +2,14 @@ import json
 import pyttsx3
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton,
-    QRadioButton, QButtonGroup, QTextEdit, QHBoxLayout
+    QRadioButton, QButtonGroup, QTextEdit, QHBoxLayout,
+    QFrame, QScrollArea
 )
 from PySide6.QtCore import Qt
-from utils.style import APP_STYLE
+from .style_constants import (
+    COLORS, BUTTON_STYLE, WINDOW_STYLE, TITLE_STYLE,
+    TITLE_FONT, DEFAULT_FONT, SPACING, MARGINS
+)
 
 class SolveQuizPage(QWidget):
     def __init__(self, main_app, quiz_id):
@@ -27,49 +31,165 @@ class SolveQuizPage(QWidget):
         self.load_quiz()
 
     def setup_ui(self):
-        self.setStyleSheet(APP_STYLE)
+        # Apply window background
+        self.setStyleSheet(WINDOW_STYLE)
+
+        # Main layout
         self.layout = QVBoxLayout(self)
+        self.layout.setSpacing(SPACING)
+        self.layout.setContentsMargins(*MARGINS)
         self.layout.setAlignment(Qt.AlignTop)
 
-        self.title = QLabel("Quiz Yükleniyor...")
-        self.title.setStyleSheet("font-size: 18px; color: white;")
-        self.layout.addWidget(self.title)
+        # Header container
+        header_container = QFrame()
+        header_container.setStyleSheet(f"""
+            QFrame {{
+                background-color: {COLORS['white']};
+                border-radius: 10px;
+                padding: 15px;
+            }}
+        """)
+        header_layout = QHBoxLayout(header_container)
 
+        # Title
+        self.title = QLabel("Quiz Yükleniyor...")
+        self.title.setFont(TITLE_FONT)
+        self.title.setStyleSheet(TITLE_STYLE)
+        header_layout.addWidget(self.title)
+
+        # Back button
+        back_button = QPushButton("← Geri")
+        back_button.setFont(DEFAULT_FONT)
+        back_button.setStyleSheet(BUTTON_STYLE)
+        back_button.setCursor(Qt.PointingHandCursor)
+        back_button.clicked.connect(lambda: self.main_app.go_to_quiz())
+        header_layout.addWidget(back_button)
+
+        self.layout.addWidget(header_container)
+
+        # Question container
+        question_container = QFrame()
+        question_container.setStyleSheet(f"""
+            QFrame {{
+                background-color: {COLORS['white']};
+                border-radius: 10px;
+                padding: 20px;
+            }}
+            QRadioButton {{
+                color: {COLORS['text']};
+                font-size: 14px;
+                padding: 8px;
+                spacing: 10px;
+            }}
+            QRadioButton::indicator {{
+                width: 20px;
+                height: 20px;
+            }}
+            QRadioButton::indicator:unchecked {{
+                background-color: {COLORS['white']};
+                border: 2px solid {COLORS['primary']};
+                border-radius: 10px;
+            }}
+            QRadioButton::indicator:checked {{
+                background-color: {COLORS['primary']};
+                border: 2px solid {COLORS['primary']};
+                border-radius: 10px;
+            }}
+            QRadioButton:hover {{
+                background-color: {COLORS['background']};
+                border-radius: 5px;
+            }}
+            QTextEdit {{
+                background-color: {COLORS['background']};
+                border: 2px solid {COLORS['primary']};
+                border-radius: 5px;
+                padding: 10px;
+                color: {COLORS['text']};
+                font-size: 14px;
+            }}
+            QTextEdit:focus {{
+                border: 2px solid {COLORS['accent']};
+            }}
+        """)
+        question_layout = QVBoxLayout(question_container)
+        question_layout.setSpacing(SPACING)
+
+        # Question text
         self.question_label = QLabel("")
         self.question_label.setWordWrap(True)
-        self.question_label.setStyleSheet("font-size: 16px; color: white;")
-        self.layout.addWidget(self.question_label)
+        self.question_label.setFont(DEFAULT_FONT)
+        self.question_label.setStyleSheet(f"color: {COLORS['text']}; font-size: 16px;")
+        question_layout.addWidget(self.question_label)
 
-        # 🔊 Oku butonu
-        # self.read_button = QPushButton("🔊 Oku")
-        # self.read_button.clicked.connect(self.read_question_aloud)
-        # self.layout.addWidget(self.read_button)
-
+        # Options
+        options_scroll = QScrollArea()
+        options_scroll.setWidgetResizable(True)
+        options_scroll.setStyleSheet("""
+            QScrollArea {
+                border: none;
+                background-color: transparent;
+            }
+        """)
+        
+        options_widget = QWidget()
+        self.options_layout = QVBoxLayout(options_widget)
+        self.options_layout.setSpacing(SPACING // 2)
         self.option_group = QButtonGroup(self)
-        self.options_layout = QVBoxLayout()
-        self.layout.addLayout(self.options_layout)
+        
+        options_scroll.setWidget(options_widget)
+        question_layout.addWidget(options_scroll)
 
+        # Text input for open-ended questions
         self.text_input = QTextEdit()
+        self.text_input.setFont(DEFAULT_FONT)
         self.text_input.setPlaceholderText("Cevabınızı buraya yazınız...")
-        self.layout.addWidget(self.text_input)
+        self.text_input.setMinimumHeight(100)
+        question_layout.addWidget(self.text_input)
         self.text_input.hide()
 
-        button_row = QHBoxLayout()
+        self.layout.addWidget(question_container)
 
-        self.next_button = QPushButton("Sonraki")
+        # Navigation buttons container
+        nav_container = QFrame()
+        nav_container.setStyleSheet(f"""
+            QFrame {{
+                background-color: {COLORS['white']};
+                border-radius: 10px;
+                padding: 15px;
+            }}
+        """)
+        nav_layout = QHBoxLayout(nav_container)
+        nav_layout.setSpacing(SPACING)
+
+        self.next_button = QPushButton("Sonraki →")
+        self.next_button.setFont(DEFAULT_FONT)
+        self.next_button.setStyleSheet(BUTTON_STYLE)
+        self.next_button.setCursor(Qt.PointingHandCursor)
         self.next_button.clicked.connect(self.save_and_next)
-        button_row.addWidget(self.next_button)
+        nav_layout.addWidget(self.next_button)
 
-        self.finish_button = QPushButton("Bitir ve Gönder")
+        self.finish_button = QPushButton("✓ Bitir ve Gönder")
+        self.finish_button.setFont(DEFAULT_FONT)
+        self.finish_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['success']};
+                border: none;
+                border-radius: 5px;
+                padding: 10px 20px;
+                color: {COLORS['text']};
+                font-weight: bold;
+            }}
+            QPushButton:hover {{
+                background-color: #7FD17F;
+                color: {COLORS['white']};
+            }}
+        """)
+        self.finish_button.setCursor(Qt.PointingHandCursor)
         self.finish_button.clicked.connect(self.finish_quiz)
-        button_row.addWidget(self.finish_button)
+        nav_layout.addWidget(self.finish_button)
         self.finish_button.hide()
 
-        self.layout.addLayout(button_row)
-
-        back_button = QPushButton("← Geri")
-        back_button.clicked.connect(lambda: self.main_app.go_to_quiz())
-        self.layout.addWidget(back_button)
+        self.layout.addWidget(nav_container)
 
     def load_quiz(self):
         result = self.api.get_quiz(self.quiz_id)
@@ -101,6 +221,7 @@ class SolveQuizPage(QWidget):
             self.option_group = QButtonGroup(self)
             for option in question.get("options", []):
                 btn = QRadioButton(option["option_text"])
+                btn.setFont(DEFAULT_FONT)
                 btn.setProperty("option_id", option["id"])
                 self.options_layout.addWidget(btn)
                 self.option_group.addButton(btn)

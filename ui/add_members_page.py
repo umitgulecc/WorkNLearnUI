@@ -1,64 +1,173 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton,
-    QComboBox, QFormLayout, QMessageBox
+    QComboBox, QFormLayout, QMessageBox, QFrame, QHBoxLayout
 )
 from PySide6.QtCore import Qt
-from utils.style import APP_STYLE
+from .style_constants import (
+    COLORS, BUTTON_STYLE, WINDOW_STYLE, TITLE_STYLE,
+    TITLE_FONT, DEFAULT_FONT, SPACING, MARGINS
+)
 
 class AddMembersPage(QWidget):
     def __init__(self, main_app):
         super().__init__()
         self.main_app = main_app
         self.api = main_app.api
-        self.setStyleSheet(APP_STYLE)
         self.setup_ui()
 
     def setup_ui(self):
+        # Apply window background
+        self.setStyleSheet(WINDOW_STYLE)
+
+        # Main layout
         layout = QVBoxLayout(self)
+        layout.setSpacing(SPACING)
+        layout.setContentsMargins(*MARGINS)
         layout.setAlignment(Qt.AlignTop)
 
+        # Header container
+        header_container = QFrame()
+        header_container.setStyleSheet(f"""
+            QFrame {{
+                background-color: {COLORS['white']};
+                border-radius: 10px;
+                padding: 15px;
+            }}
+        """)
+        header_layout = QHBoxLayout(header_container)
+
+        # Title
         title = QLabel("👥 Yeni Kullanıcı Ekle")
-        title.setStyleSheet("font-size: 18px; color: white;")
-        layout.addWidget(title)
+        title.setFont(TITLE_FONT)
+        title.setStyleSheet(TITLE_STYLE)
+        header_layout.addWidget(title)
 
+        # Back button
+        back_btn = QPushButton("← Geri")
+        back_btn.setFont(DEFAULT_FONT)
+        back_btn.setStyleSheet(BUTTON_STYLE)
+        back_btn.setCursor(Qt.PointingHandCursor)
+        back_btn.clicked.connect(lambda: self.main_app.setCurrentWidget(self.main_app.dashboard))
+        header_layout.addWidget(back_btn)
+
+        layout.addWidget(header_container)
+
+        # Form container
+        form_container = QFrame()
+        form_container.setStyleSheet(f"""
+            QFrame {{
+                background-color: {COLORS['white']};
+                border-radius: 10px;
+                padding: 20px;
+            }}
+            QLineEdit {{
+                background-color: {COLORS['background']};
+                border: 2px solid {COLORS['primary']};
+                border-radius: 5px;
+                padding: 10px;
+                color: {COLORS['text']};
+                font-size: 14px;
+            }}
+            QLineEdit:focus {{
+                border: 2px solid {COLORS['accent']};
+            }}
+            QComboBox {{
+                background-color: {COLORS['background']};
+                border: 2px solid {COLORS['primary']};
+                border-radius: 5px;
+                padding: 10px;
+                color: {COLORS['text']};
+                font-size: 14px;
+            }}
+            QComboBox:focus {{
+                border: 2px solid {COLORS['accent']};
+            }}
+            QComboBox::drop-down {{
+                border: none;
+                padding-right: 10px;
+            }}
+            QComboBox::down-arrow {{
+                image: none;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 5px solid {COLORS['text']};
+                margin-right: 5px;
+            }}
+            QLabel {{
+                color: {COLORS['text']};
+                font-size: 14px;
+                font-weight: bold;
+            }}
+        """)
+        form_layout = QVBoxLayout(form_container)
+        form_layout.setSpacing(SPACING)
+
+        # Form
         form = QFormLayout()
+        form.setSpacing(SPACING)
 
+        # Name input
         self.name_input = QLineEdit()
+        self.name_input.setFont(DEFAULT_FONT)
+        self.name_input.setPlaceholderText("Ad Soyad")
         form.addRow("Ad Soyad:", self.name_input)
 
+        # Email input
         self.email_input = QLineEdit()
+        self.email_input.setFont(DEFAULT_FONT)
+        self.email_input.setPlaceholderText("E-posta")
         form.addRow("E-Posta:", self.email_input)
 
+        # Password input
         self.password_input = QLineEdit()
+        self.password_input.setFont(DEFAULT_FONT)
+        self.password_input.setPlaceholderText("Şifre")
         self.password_input.setEchoMode(QLineEdit.Password)
         form.addRow("Şifre:", self.password_input)
 
+        # Role combo
         self.role_combo = QComboBox()
+        self.role_combo.setFont(DEFAULT_FONT)
         self.role_combo.addItem("Çalışan", 3)
         self.role_combo.addItem("Yönetici", 2)
         self.role_combo.addItem("Genel Müdür", 1)
         form.addRow("Rol:", self.role_combo)
 
+        # Department combo
         self.department_combo = QComboBox()
+        self.department_combo.setFont(DEFAULT_FONT)
         self.department_combo.addItem("Yazılım", 1)
         self.department_combo.addItem("İK", 2)
         self.department_combo.addItem("Pazarlama", 3)
         form.addRow("Departman:", self.department_combo)
 
-        layout.addLayout(form)
+        form_layout.addLayout(form)
 
-        # Kullanıcı Ekle Butonu
+        # Add user button
         add_btn = QPushButton("➕ Ekle")
+        add_btn.setFont(DEFAULT_FONT)
+        add_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['success']};
+                border: none;
+                border-radius: 5px;
+                padding: 10px 20px;
+                color: {COLORS['text']};
+                font-weight: bold;
+            }}
+            QPushButton:hover {{
+                background-color: #7FD17F;
+                color: {COLORS['white']};
+            }}
+        """)
+        add_btn.setCursor(Qt.PointingHandCursor)
         add_btn.clicked.connect(self.submit_user)
-        layout.addWidget(add_btn)
+        form_layout.addWidget(add_btn)
 
-        # Geri Dön Butonu
-        back_btn = QPushButton("◀️ Geri")
-        back_btn.clicked.connect(lambda: self.main_app.setCurrentWidget(self.main_app.dashboard))
-        layout.addWidget(back_btn)
+        layout.addWidget(form_container)
 
         self.role_combo.currentIndexChanged.connect(self.toggle_department_visibility)
-        self.toggle_department_visibility()  # ilk seçimde departmanı kontrol et
+        self.toggle_department_visibility()  # Check department on first selection
 
     def toggle_department_visibility(self):
         role_id = self.role_combo.currentData()

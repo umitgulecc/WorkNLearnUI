@@ -1,4 +1,12 @@
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
+from PySide6.QtWidgets import (
+    QDialog, QVBoxLayout, QLabel, QLineEdit,
+    QPushButton, QMessageBox, QFrame
+)
+from PySide6.QtCore import Qt
+from .style_constants import (
+    COLORS, BUTTON_STYLE, WINDOW_STYLE, TITLE_STYLE,
+    TITLE_FONT, DEFAULT_FONT, SPACING, MARGINS
+)
 
 class AddEmployeeForm(QDialog):
     def __init__(self, main_app):
@@ -7,31 +15,115 @@ class AddEmployeeForm(QDialog):
         self.api = main_app.api
 
         self.setWindowTitle("Yeni Çalışan Ekle")
-        self.setFixedSize(300, 250)
+        self.setFixedSize(400, 400)
+        self.setup_ui()
 
+    def setup_ui(self):
+        # Apply window background
+        self.setStyleSheet(WINDOW_STYLE)
+
+        # Main layout
         layout = QVBoxLayout(self)
+        layout.setSpacing(SPACING)
+        layout.setContentsMargins(*MARGINS)
+
+        # Form container
+        form_container = QFrame()
+        form_container.setStyleSheet(f"""
+            QFrame {{
+                background-color: {COLORS['white']};
+                border-radius: 10px;
+                padding: 20px;
+            }}
+            QLineEdit {{
+                background-color: {COLORS['background']};
+                border: 2px solid {COLORS['primary']};
+                border-radius: 5px;
+                padding: 10px;
+                color: {COLORS['text']};
+                font-size: 14px;
+            }}
+            QLineEdit:focus {{
+                border: 2px solid {COLORS['accent']};
+            }}
+        """)
+        form_layout = QVBoxLayout(form_container)
+        form_layout.setSpacing(SPACING)
+
+        # Title
+        title = QLabel("👤 Yeni Çalışan Ekle")
+        title.setFont(TITLE_FONT)
+        title.setStyleSheet(TITLE_STYLE)
+        title.setAlignment(Qt.AlignCenter)
+        form_layout.addWidget(title)
+
+        # Name input
+        name_label = QLabel("Ad Soyad")
+        name_label.setFont(DEFAULT_FONT)
+        name_label.setStyleSheet(f"color: {COLORS['text']};")
+        form_layout.addWidget(name_label)
 
         self.name_input = QLineEdit()
+        self.name_input.setFont(DEFAULT_FONT)
         self.name_input.setPlaceholderText("Ad Soyad")
-        layout.addWidget(self.name_input)
+        form_layout.addWidget(self.name_input)
+
+        # Email input
+        email_label = QLabel("E-posta")
+        email_label.setFont(DEFAULT_FONT)
+        email_label.setStyleSheet(f"color: {COLORS['text']};")
+        form_layout.addWidget(email_label)
 
         self.email_input = QLineEdit()
+        self.email_input.setFont(DEFAULT_FONT)
         self.email_input.setPlaceholderText("E-posta")
-        layout.addWidget(self.email_input)
+        form_layout.addWidget(self.email_input)
+
+        # Password input
+        password_label = QLabel("Şifre")
+        password_label.setFont(DEFAULT_FONT)
+        password_label.setStyleSheet(f"color: {COLORS['text']};")
+        form_layout.addWidget(password_label)
 
         self.password_input = QLineEdit()
+        self.password_input.setFont(DEFAULT_FONT)
         self.password_input.setPlaceholderText("Şifre")
         self.password_input.setEchoMode(QLineEdit.Password)
-        layout.addWidget(self.password_input)
+        form_layout.addWidget(self.password_input)
+
+        # Department input
+        department_label = QLabel("Departman")
+        department_label.setFont(DEFAULT_FONT)
+        department_label.setStyleSheet(f"color: {COLORS['text']};")
+        form_layout.addWidget(department_label)
 
         self.department_input = QLineEdit()
+        self.department_input.setFont(DEFAULT_FONT)
         self.department_input.setPlaceholderText("Departman Adı")
-        layout.addWidget(self.department_input)
+        form_layout.addWidget(self.department_input)
 
+        # Submit button
         self.submit_btn = QPushButton("✅ Kaydet")
-        self.submit_btn.setStyleSheet("background-color: #2196F3; color: white; padding: 8px; border-radius: 6px;")
+        self.submit_btn.setFont(DEFAULT_FONT)
+        self.submit_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {COLORS['success']};
+                border: none;
+                border-radius: 5px;
+                padding: 10px 20px;
+                color: {COLORS['text']};
+                font-weight: bold;
+            }}
+            QPushButton:hover {{
+                background-color: #7FD17F;
+                color: {COLORS['white']};
+            }}
+        """)
+        self.submit_btn.setCursor(Qt.PointingHandCursor)
         self.submit_btn.clicked.connect(self.register_employee)
-        layout.addWidget(self.submit_btn)
+        form_layout.addWidget(self.submit_btn)
+
+        layout.addWidget(form_container)
 
     def register_employee(self):
         departments = self.api.get_departments()
