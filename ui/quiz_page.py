@@ -35,8 +35,6 @@ class QuizPage(QWidget):
 
     def load_quizzes(self):
         result = self.api.get_available_quizzes()
-        print("Quiz çekme sonucu:", result)
-
         if result["success"]:
             for quiz in result["quizzes"]:
                 self.add_quiz_item(quiz)
@@ -72,7 +70,7 @@ class QuizPage(QWidget):
                 background-color: #558be0;
             }
         """)
-        start_btn.clicked.connect(lambda: self.main_app.go_to_solve_quiz(quiz["id"]))
+        start_btn.clicked.connect(lambda: self.main_app.go_to_solve_quiz(quiz))
 
         hbox.addWidget(title)
         hbox.addStretch()

@@ -5,6 +5,7 @@ from ui.quiz_page import QuizPage
 from api_client import APIClient
 from ui.result_page import ResultsPage
 from ui.solve_quiz_page import SolveQuizPage
+from ui.solve_quiz_page_reading import SolveQuizPageReading
 from ui.review_quiz_page import ReviewQuizPage
 
 import sys
@@ -56,10 +57,15 @@ class MainApp(QStackedWidget):
         self.addWidget(self.quiz_page)
         self.setCurrentWidget(self.quiz_page)
 
-    def go_to_solve_quiz(self, quiz_id):
-        self.solve_quiz_page = SolveQuizPage(self, quiz_id)
-        self.addWidget(self.solve_quiz_page)
-        self.setCurrentWidget(self.solve_quiz_page)
+    def go_to_solve_quiz(self, quiz):
+        if quiz["skill_id"] in[1,3]:
+            self.solve_quiz_page = SolveQuizPage(self, quiz["id"])
+            self.addWidget(self.solve_quiz_page)
+            self.setCurrentWidget(self.solve_quiz_page)
+        else:
+            self.solve_quiz_page_reading = SolveQuizPageReading(self, quiz["id"])
+            self.addWidget(self.solve_quiz_page_reading)
+            self.setCurrentWidget(self.solve_quiz_page_reading)
     
 
     def go_to_review_quiz(self, result_id, user_id=None):
