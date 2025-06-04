@@ -1,0 +1,145 @@
+📁 ui/ Klasörü - Kullanıcı Arayüzü (UI) Modülü
+Bu klasör, sistemin masaüstü kullanıcı arayüzünü barındırır. Arayüz, PySide6 ve PyQt6 kullanılarak geliştirilmiştir ve kullanıcı rollerine göre farklı paneller içerir.
+
+💡 Genel Bilgiler
+Bu arayüz, main.py dosyası üzerinden çalıştırılır.
+
+Backend ile iletişim api_client.py üzerinden kurulur.
+
+Her bir Python dosyası, belirli bir UI ekranını temsil eder.
+
+Kullanıcı rolleri: Yöneticiler (Genel Müdür), Müdürler, Çalışanlar.
+
+🧩 Dosya Açıklamaları
+Dosya Adı	Açıklama
+add_employee_form_page.py	Yeni bir çalışan eklemek için form ekranı.
+add_members_page.py	Mevcut bir gruba yeni üyeler eklemeyi sağlar.
+delete_all_members_page.py	Bir grubun tüm üyelerini silmeye yarar.
+delete_employee_page.py	Çalışan silme işlemi yapılır.
+director_dashboard_page.py	Genel Müdür için özel gösterge paneli. Tüm kullanıcıların istatistiklerini görüntüleyebilir.
+employee_dashboard_page.py	Çalışanların yalnızca kendi bilgilerini ve sınav geçmişini görebileceği panel.
+employee_stats_page.py	Çalışanın detaylı beceri analizlerini gösteren ekran.
+login_page.py	Giriş ekranı. Token tabanlı doğrulama yapılır.
+manager_dashboard_page.py	Müdürlerin sadece kendi ekiplerine ait verileri görüntüleyebileceği panel.
+
+📌 Not: Diğer dosyalar da benzer şekilde tekil işlevleri yerine getiren PySide6 ekranlarını temsil eder.
+
+🛠 Gereksinimler
+Proje, aşağıdaki Python paketlerini kullanır:
+
+Arayüzle doğrudan ilgili paketler:
+
+PySide6==6.9.0
+
+PyQt6==6.9.0
+
+shiboken6==6.9.0
+
+pyttsx3==2.98 (isteğe bağlı, sesli geri bildirim amaçlı)
+
+opencv-python==4.10.0.84 (kamera veya görsel destek gerekiyorsa)
+
+requests==2.32.3 (API istekleri için)
+
+python-dotenv==1.1.0 (ortam değişkenleri ile çalışma)
+
+rich==14.0.0 (konsol çıktıları için stil)
+
+Tam gereksinim listesi: requirements.txt dosyasındadır.
+
+
+Klasor Yapılanması:
+
+│   api_client.py
+│   directory_structure.txt
+│   main.py
+│   requirements.txt
+│   
+├───models
+│       quiz_model.py
+│       user_model.py
+│       
+├───resources
+│   └───fonts
+├───ui
+│   │   add_employee_form_page.py
+│   │   add_members_page.py
+│   │   delete_all_members_page.py
+│   │   delete_employee_page.py
+│   │   director_dashboard_page.py
+│   │   employee_dashboard_page.py
+│   │   employee_stats_page.py
+│   │   login_page.py
+│   │   manager_dashboard_page.py
+│   │   quiz_page.py
+│   │   result_page.py
+│   │   review_quiz_page.py
+│   │   solve_quiz_page.py
+│   │   solve_quiz_page_reading.py
+│   │   team_member_details_page.py
+│   │   
+│   └───__pycache__
+│           add_employee_form_page.cpython-312.pyc
+│           add_members_page.cpython-312.pyc
+│           dashboard.cpython-312.pyc
+│           delete_all_members_page.cpython-312.pyc
+│           delete_employee_page.cpython-312.pyc
+│           director_dashboard_page.cpython-312.pyc
+│           employee_dashboard_page.cpython-312.pyc
+│           employee_stats_page.cpython-312.pyc
+│           login_page.cpython-312.pyc
+│           manager_dashboard_employee.cpython-312.pyc
+│           manager_dashboard_page.cpython-312.pyc
+│           quiz_page.cpython-312.pyc
+│           register_page.cpython-312.pyc
+│           result_page.cpython-312.pyc
+│           review_quiz_page.cpython-312.pyc
+│           solve_quiz_page.cpython-312.pyc
+│           solve_quiz_page_reading.cpython-312.pyc
+│           team_member_details_page.cpython-312.pyc
+│           
+├───utils
+│   │   auth.py
+│   │   style.py
+│   │   
+│   └───__pycache__
+│           style.cpython-312.pyc
+│           
+├───widgets
+│       question_card.py
+│       
+└───__pycache__
+        api_client.cpython-312.pyc
+        
+
+Kurulum:
+
+bash
+Kopyala
+Düzenle
+pip install -r requirements.txt
+🚀 Başlatmak için
+.env dosyasını oluşturun ve API URL'sini belirtin:
+
+env
+Kopyala
+Düzenle
+API_BASE_URL=http://localhost:8000
+Ana dosyayı çalıştırın:
+
+bash
+Kopyala
+Düzenle
+python main.py
+📁 Klasör Bağlantıları
+models/: UI tarafında kullanılan modeller (örneğin: kullanıcı, quiz veri sınıfları).
+
+resources/fonts/: UI arayüzünde kullanılan özel fontlar (varsa).
+
+api_client.py: Backend API ile haberleşme katmanı.
+
+main.py: Uygulamanın giriş noktasıdır.
+
+Hazırlayan: ÜMİT GÜLEÇ
+Tarih: 4 Haziran 2025
+
